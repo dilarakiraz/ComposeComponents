@@ -319,7 +319,7 @@ fun RadioButtonGroupExample() {
 }
 
 @Composable
-fun CardExample() {
+private fun CardExample() {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.padding(2.dp)
