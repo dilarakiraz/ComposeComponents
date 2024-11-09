@@ -1,8 +1,11 @@
 package com.example.composecomponents.ui
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -44,8 +49,10 @@ private fun DatePickers() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item { DatePickerDocked() }
+        item { DatePickerModal({}, {}) }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +73,7 @@ fun DatePickerDocked() {
             readOnly = true,
             trailingIcon = {
                 IconButton(
-                    onClick = { showDatePicker = !showDatePicker}) {
+                    onClick = { showDatePicker = !showDatePicker }) {
                     Icon(
                         imageVector = Icons.Default.DateRange,
                         contentDescription = "Selected date"
@@ -79,10 +86,10 @@ fun DatePickerDocked() {
         )
 
         if (showDatePicker) {
-            Popup (
-                onDismissRequest = { showDatePicker = false},
+            Popup(
+                onDismissRequest = { showDatePicker = false },
                 alignment = Alignment.TopStart
-            ){
+            ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -90,7 +97,7 @@ fun DatePickerDocked() {
                         .shadow(elevation = 4.dp)
                         .background(MaterialTheme.colorScheme.surface)
                         .padding(16.dp)
-                ){
+                ) {
                     DatePicker(
                         state = datePickerState,
                         showModeToggle = false,
@@ -104,6 +111,47 @@ fun DatePickerDocked() {
 fun convertMillisToDate(millis: Long): String {
     val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
     return formatter.format(Date(millis))
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerModal(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+
+    Dialog(
+        onDismissRequest = onDismiss
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(16.dp)
+        )
+        {
+            Column {
+                DatePicker(state = datePickerState)
+
+                Row (
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    TextButton(onClick =
+                    {
+                        onDateSelected(datePickerState.selectedDateMillis)
+                    }) {
+                        Text("ok")
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Preview
